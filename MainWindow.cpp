@@ -45,6 +45,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	ui->setupUi(this);
 
+	QString windowname = APP_NAME + " v" + APP_VERSION_TXT + " (" + QString::number(APP_VERSION, 'f', 2) + ")";
+	setWindowTitle(windowname);
+
 	// hide variance button for older versions of cal program
 	if (calVersion <= 1.0f)
 		 ui->pushButton_var_cal3->hide();
@@ -95,6 +98,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+	if (ps_master.state() == QProcess::Running)
+		ps_master.close();
+
 	writeSettings();
 	delete ui;
 }
