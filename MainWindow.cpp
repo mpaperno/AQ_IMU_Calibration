@@ -19,7 +19,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
 	bool ok;
 
-	aqBinFolderPath = QCoreApplication::applicationDirPath() + "/bin/";
+	aqBinFolderPath = QCoreApplication::applicationDirPath() + "/aq/bin/";
 #if defined(Q_OS_WIN)
 	platformExeExt = ".exe";
 #else
