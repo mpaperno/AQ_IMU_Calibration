@@ -84,11 +84,12 @@ win32-msvc2008|win32-msvc2010 {
 macx|macx-g++42|macx-g++|macx-llvm: {
 
 	ICON = resources/app_icon.icns
+	LIBS += -lm
 
 	# Copy AQ files
-	QMAKE_POST_LINK += && mkdir -p $${BASEDIR}/$${TARGET}.app/Contents/MacOS/aq/bin
+	QMAKE_POST_LINK += mkdir -p $${TARGETDIR}/$${TARGET}.app/Contents/MacOS/aq/bin
 	QMAKE_POST_LINK += && cp -rf $${BASEDIR}/bin/aq_osx_all/* $${TARGETDIR}/$${TARGET}.app/Contents/MacOS/aq/bin
-	QMAKE_POST_LINK += && chmod +x $${BASEDIR}/$${TARGET}.app/Contents/MacOS/aq/bin/*
+	QMAKE_POST_LINK += && chmod +x $${TARGETDIR}/$${TARGET}.app/Contents/MacOS/aq/bin/*
 
 }
 
@@ -109,7 +110,7 @@ linux-g++|linux-g++-64{
 	DESTDIR = $$TARGETDIR
 
 	# Copy AQ files
-	QMAKE_POST_LINK += && mkdir -p $${TARGETDIR}/aq/bin
+	QMAKE_POST_LINK += mkdir -p $${TARGETDIR}/aq/bin
 	QMAKE_POST_LINK += && cp -rf $${BASEDIR}/bin/aq_unix_all/* $${TARGETDIR}/aq/bin
 	QMAKE_POST_LINK += && chmod +x $${TARGETDIR}/aq/bin/*
 

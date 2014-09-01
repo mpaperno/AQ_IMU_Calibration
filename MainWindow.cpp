@@ -11,6 +11,8 @@
 #include <QTextStream>
 #include <QSettings>
 
+#include "math.h"
+
 #include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent) :
