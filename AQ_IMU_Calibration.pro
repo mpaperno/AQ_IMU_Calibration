@@ -96,17 +96,15 @@ macx|macx-g++42|macx-g++|macx-llvm: {
 # GNU/Linux
 linux-g++|linux-g++-64{
 
-	debug {
+	CONFIG(debug, debug|release) {
 		TARGETDIR = $${TARGETDIR}/debug
 	}
-	release {
+	CONFIG(release, debug|release) {
 		TARGETDIR = $${TARGETDIR}/release
 	}
-	# Validated copy commands
 	!exists($$TARGETDIR) {
-		QMAKE_POST_LINK += && mkdir -p $${TARGETDIR}
+		QMAKE_POST_LINK += mkdir -p $${TARGETDIR} &&
 	}
-
 	DESTDIR = $$TARGETDIR
 
 	# Copy AQ files
