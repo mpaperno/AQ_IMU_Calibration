@@ -40,13 +40,16 @@ FORMS += MainWindow.ui
 
 RESOURCES += resources.qrc
 
-# Windows (32bit)
-win32-msvc2008|win32-msvc2010 {
+# Windows
+win32-msvc2010|win32-msvc2012|win32-g++ {
 
 	RC_FILE = icon.rc
 
-	# Copy dependencies
-	BASEDIR = $$replace(BASEDIR, "/", "\\")
+	# Adjust paths to backslash
+	BASEDIR ~= s,/,\\,g
+	TARGETDIR ~= s,/,\\,g
+
+	#determine name of Qt DLLs to distribute
 	greaterThan(QT_MAJOR_VERSION, 4) {
 		QTLIBDLLPFX = "Qt5"
 		QTLIBDLLSFX = ".dll"
@@ -54,28 +57,43 @@ win32-msvc2008|win32-msvc2010 {
 		QTLIBDLLPFX = "Qt"
 		QTLIBDLLSFX = "4.dll"
 	}
+	# target folder name depends on build type
 	CONFIG(release, debug|release) {
-		TARGETDIR = $$replace(TARGETDIR,"/","\\")\\release
+		TARGETDIR = "$${TARGETDIR}\\release"
 	}
 	CONFIG(debug, debug|release) {
-	  TARGETDIR = $$replace(TARGETDIR, "/", "\\")\\debug
-	  greaterThan(QT_MAJOR_VERSION, 4) {
-			QTLIBDLLSFX = "d.dll"
-	  } else {
-			QTLIBDLLSFX = "d4.dll"
-	  }
+	  TARGETDIR = "$${TARGETDIR}\\debug"
+	  QTLIBDLLSFX = "d$${QTLIBDLLSFX}"
 	}
 
-	# Copy AQ files
-	QMAKE_POST_LINK += $$quote(xcopy /D /Y "$${BASEDIR}\\bin\\aq_win_all\\*" "$${TARGETDIR}\\aq\\bin" /E /I $$escape_expand(\\n))
-	# Qt library DLLs
-	QMAKE_POST_LINK += $$quote(xcopy /D /Y "$$(QTDIR)\\bin\\$${QTLIBDLLPFX}Core$${QTLIBDLLSFX}" "$$TARGETDIR"$$escape_expand(\\n))
-	QMAKE_POST_LINK += $$quote(xcopy /D /Y "$$(QTDIR)\\bin\\$${QTLIBDLLPFX}Gui$${QTLIBDLLSFX}" "$$TARGETDIR"$$escape_expand(\\n))
+	# hack around mingw deploy wierdness
+	FILEWILDCARD = "*"
+	win32-g++: FILEWILDCARD = "\*"
 
+	# Copy AQ files
+	QMAKE_POST_LINK += $$quote(xcopy /D /Y "$${BASEDIR}\\bin\\aq_win_all\\$${FILEWILDCARD}" "$${TARGETDIR}\\aq\\bin" /E /I $$escape_expand(\\n\\t))
+
+	# copy required supporting DLLs for release version
 	CONFIG(release, debug|release) {
-		# Copy Visual Studio DLLs
+		# Qt library DLLs
+		QMAKE_POST_LINK += $$quote(xcopy /D /Y "$$(QTDIR)\\bin\\$${QTLIBDLLPFX}Core$${QTLIBDLLSFX}" "$$TARGETDIR"$$escape_expand(\\n\\t))
+		QMAKE_POST_LINK += $$quote(xcopy /D /Y "$$(QTDIR)\\bin\\$${QTLIBDLLPFX}Gui$${QTLIBDLLSFX}" "$$TARGETDIR"$$escape_expand(\\n\\t))
+		greaterThan(QT_MAJOR_VERSION, 4) {
+			QMAKE_POST_LINK += $$quote(xcopy /D /Y "$$(QTDIR)\\bin\\$${QTLIBDLLPFX}Widgets$${QTLIBDLLSFX}" "$$TARGETDIR"$$escape_expand(\\n\\t))
+		}
+		# Compiler-specific DLLs
 		win32-msvc2010 {
 			 QMAKE_POST_LINK += $$quote(xcopy /D /Y "\"C:\\Program Files \(x86\)\\Microsoft Visual Studio 10.0\\VC\\redist\\x86\\Microsoft.VC100.CRT\\*.dll\""  "$${TARGETDIR}\\"$$escape_expand(\\n))
+		}
+		win32-msvc2012 {
+			 QMAKE_POST_LINK += $$quote(xcopy /D /Y "\"C:\\Program Files \(x86\)\\Microsoft Visual Studio 11.0\\VC\\redist\\x86\\Microsoft.VC110.CRT\\*.dll\""  "$${TARGETDIR}\\"$$escape_expand(\\n))
+		}
+		win32-g++ {
+			# we need to know where MinGW lives so we can copy some DLLs from there.
+			MINGW_PATH = $$(MINGW_PATH)
+			isEmpty(MINGW_PATH): error("MINGW_PATH not found")
+			QMAKE_POST_LINK  += $$quote(xcopy /D /Y "$${MINGW_PATH}\\bin\\libwinpthread-1.dll"  "$${TARGETDIR}"$$escape_expand(\\n\\t))
+			QMAKE_POST_LINK  += $$quote(xcopy /D /Y "$${MINGW_PATH}\\bin\\libstdc++-6.dll"  "$${TARGETDIR}"$$escape_expand(\\n))
 		}
 	}
 }
