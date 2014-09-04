@@ -1,0 +1,22 @@
+AutoQuad IMU Calibration Utility
+==========================
+
+Calibration graphical user interface and utilities for AutoQuad Analog and Digital Innertial Measurement Units (IMU).
+This project is a front-end for the AutoQuad calibration command-line utilities.
+
+Compiled binaries of the utilities for Windows, Linux, and OS x are included here.
+
+To compile this project on Windows/Linux/OS X you need to install Qt SDK (v 4.8.x or 5.x), open the .pro file in QtCreator,
+and build it from there.  Distribution steps are included to copy all necessary files to the output (build) folder.
+
+AutoQuad Project:
+http://autoquad.org
+
+AutoQuad Documentation
+http://autoquad.org/wiki/wiki
+
+AutoQuad Compiled Software and Firmware Downloads
+http://autoquad.org/software-downloads/
+
+AutoQuad Forums:
+http://forums.autoquad.org
