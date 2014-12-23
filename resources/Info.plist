@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
+	<key>CFBundleIconFile</key>
+	<string>app_icon.icns</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleVersion</key>
+	<string>540</string>
+	<key>CFBundleShortVersionString</key>
+	<string>5.4.0</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleExecutable</key>
+	<string>AQ_IMU_Calibration</string>
+	<key>CFBundleIdentifier</key>
+	<string>org.autoquad.AQ_IMU_Calibration</string>
+	<key>NOTE</key>
+	<string>AutoQuad Analog and Digitial IMU calibration utilities.</string>
+</dict>
+</plist>
