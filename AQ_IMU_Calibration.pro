@@ -133,10 +133,14 @@ linux-g++|linux-g++-64{
 	linux-g++ {
 		QMAKE_POST_LINK += && mv -f $${TARGETDIR}/aq/bin/cal_32 $${TARGETDIR}/aq/bin/cal
 		QMAKE_POST_LINK += && mv -f $${TARGETDIR}/aq/bin/sim3_32 $${TARGETDIR}/aq/bin/sim3
+		QMAKE_POST_LINK += && mv -f $${TARGETDIR}/aq/bin/cal_AIMU_32 $${TARGETDIR}/aq/bin/cal_AIMU
+		QMAKE_POST_LINK += && mv -f $${TARGETDIR}/aq/bin/sim3_AIMU_32 $${TARGETDIR}/aq/bin/sim3_AIMU
 	}
 	linux-g++-64 {
 		QMAKE_POST_LINK += && mv -f $${TARGETDIR}/aq/bin/cal_64 $${TARGETDIR}/aq/bin/cal
 		QMAKE_POST_LINK += && mv -f $${TARGETDIR}/aq/bin/sim3_64 $${TARGETDIR}/aq/bin/sim3
+		QMAKE_POST_LINK += && mv -f $${TARGETDIR}/aq/bin/cal_AIMU_64 $${TARGETDIR}/aq/bin/cal_AIMU
+		QMAKE_POST_LINK += && mv -f $${TARGETDIR}/aq/bin/sim3_AIMU_64 $${TARGETDIR}/aq/bin/sim3_AIMU
 	}
 
 }

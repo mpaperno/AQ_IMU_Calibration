@@ -49,6 +49,7 @@ public slots:
 	double Round(double Zahl, unsigned int Stellen);
 	void CalculatDeclination();
 	void CalculatInclination();
+	void setCalVersion();
 
 	bool checkProcRunning(bool warn = true);
 	void prtstexit(int stat);

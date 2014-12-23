@@ -19,24 +19,12 @@ MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
 	ui(new Ui::MainWindow)
 {
-	bool ok;
-
 	aqBinFolderPath = QCoreApplication::applicationDirPath() + "/aq/bin/";
 #if defined(Q_OS_WIN)
 	platformExeExt = ".exe";
 #else
 	platformExeExt = "";
 #endif
-
-	calVersion = 1.0f;
-	if (QFile::exists(aqBinFolderPath + "cal_version.txt")) {
-		QFile cverfile(aqBinFolderPath + "cal_version.txt");
-		if (cverfile.open(QFile::ReadOnly | QFile::Text)) {
-			float chkver = cverfile.readAll().trimmed().toFloat(&ok);
-			if (ok)
-				calVersion = chkver;
-		}
-	}
 
 	QSettings settings;
 	if (settings.contains("WINDOW_GEOMETRY"))
@@ -47,12 +35,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	ui->setupUi(this);
 
-	QString windowname = APP_NAME + " v" + APP_VERSION_TXT + " (" + QString::number(APP_VERSION, 'f', 2) + ")";
+	QString windowname = "%1 v%2 (%3)";
+	windowname = windowname.arg(APP_NAME).arg(APP_VERSION_TXT).arg(APP_VERSION, 8, 16, QChar('0'));
 	setWindowTitle(windowname);
-
-	// hide variance button for older versions of cal program
-	if (calVersion <= 1.0f)
-		 ui->pushButton_var_cal3->hide();
 
 	// GUI slots
 	connect(ui->pushButton_Add_Static, SIGNAL(clicked()),this,SLOT(addStatic()));
@@ -86,6 +71,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(ui->checkBox_sim3_5_stop, SIGNAL(clicked()),this,SLOT(check_stop()));
 	connect(ui->checkBox_sim3_6_var, SIGNAL(clicked()),this,SLOT(check_var()));
 	connect(ui->checkBox_sim3_6_stop, SIGNAL(clicked()),this,SLOT(check_stop()));
+	connect(ui->checkBox_DIMU, SIGNAL(clicked()),this,SLOT(setCalVersion()));
 
 	//Process Slots
 	//ps_master.setProcessChannelMode(QProcess::MergedChannels);
@@ -95,6 +81,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(&ps_master, SIGNAL(error(QProcess::ProcessError)), this, SLOT(extProcessError(QProcess::ProcessError)));
 
 	loadSettings();
+	setCalVersion();
 
 }
 
@@ -122,6 +109,12 @@ void MainWindow::changeEvent(QEvent *e)
 void MainWindow::loadSettings()
 {
 	QSettings settings;
+
+	if (settings.contains("WINDOW_GEOMETRY"))
+		restoreGeometry(settings.value("WINDOW_GEOMETRY").toByteArray());
+
+	if (settings.contains("WINDOW_STATE"))
+		restoreState(settings.value("WINDOW_STATE").toByteArray());
 
 	if (settings.contains("STATIC_FILE_COUNT"))
 	{
@@ -165,6 +158,7 @@ void MainWindow::loadSettings()
 	ui->sim3_6_stop->setText(settings.value("AUTOQUAD_STOP4").toString());
 
 	LastFilePath = settings.value("AUTOQUAD_LAST_PATH").toString();
+	ui->checkBox_DIMU->setChecked(settings.value("CALIB_USE_DIMU").toBool());
 
 }
 
@@ -201,9 +195,12 @@ void MainWindow::writeSettings()
 	settings.setValue("AUTOQUAD_STOP4", ui->sim3_5_stop->text());
 
 	settings.setValue("AUTOQUAD_LAST_PATH", LastFilePath);
+	settings.setValue("CALIB_USE_DIMU", ui->checkBox_DIMU->isChecked());
 
-	if (isVisible())
-		 settings.setValue("WINDOW_GEOMETRY", saveGeometry());
+	if (!isMinimized()) {
+		settings.setValue("WINDOW_GEOMETRY", saveGeometry());
+		settings.setValue("WINDOW_STATE", saveState());
+	}
 
 	settings.sync();
 }
@@ -433,6 +430,25 @@ void MainWindow::CalculatInclination() {
 
 }
 
+void MainWindow::setCalVersion()
+{
+	calVersion = 1.0f;
+	if (ui->checkBox_DIMU->isChecked())
+		calVersion = 2.0f;
+
+	// hide variance button for older versions of cal program
+	ui->pushButton_var_cal3->setVisible(calVersion > 1.0f);
+
+//	if (QFile::exists(aqBinFolderPath + "cal_version.txt")) {
+//		QFile cverfile(aqBinFolderPath + "cal_version.txt");
+//		if (cverfile.open(QFile::ReadOnly | QFile::Text)) {
+//			float chkver = cverfile.readAll().trimmed().toFloat(&ok);
+//			if (ok)
+//				calVersion = chkver;
+//		}
+//	}
+}
+
 
 void MainWindow::check_var()
 {
@@ -504,6 +520,9 @@ void MainWindow::startCalculationProcess(QString appName, QStringList appArgs) {
 		return;
 
 	writeSettings();
+
+	if (calVersion < 2.0)
+		appName += "_AIMU";
 
 	QString appPath = "\"" + QDir::toNativeSeparators(aqBinFolderPath + appName + platformExeExt) + "\" " + appArgs.join(" ");
 
